@@ -14,13 +14,13 @@ st_autorefresh(interval=10 * 1000, key="cryptorefresh")
 st.title("🚀 Live Crypto Trends Dashboard")
 st.write("Fetching real-time updates directly from the Supabase cloud database.")
 
-# Embedded your verified Supabase PostgreSQL connection URI string
+# Embedded verified Supabase PostgreSQL connection URI string with connection pooling configuration
 DB_URI = "postgresql://postgres:5wMyFJQNMvgpON2N@aws-0-ap-south-1.pooler.supabase.co:6543/postgres?sslmode=require"
 
 @st.cache_resource
 def get_db_engine():
     """Initializes and caches the SQLAlchemy database engine connection."""
-    return create_engine(DB_URI)
+    return create_engine(DB_URI, pool_pre_ping=True)
 
 def fetch_data():
     """Executes SQL query to pull the latest live data from crypto_live_trends table."""
@@ -53,6 +53,10 @@ if df is not None and not df.empty:
     # Convert text timestamps to pandas datetime format for timeline plotting
     if 'timestamp' in df.columns:
         df['timestamp'] = pd.to_datetime(df['timestamp'])
+
+    # Standardize string symbols safely to prevent missing data crashes
+    if 'symbol' in df.columns:
+        df['symbol'] = df['symbol'].fillna('').astype(str)
 
     # Dynamic check for the price change column variations
     p_change_col = 'price_change_24h' if 'price_change_24h' in df.columns else (
@@ -108,7 +112,7 @@ if df is not None and not df.empty:
         
     with col2:
         btc_df = df[df['symbol'].str.lower() == 'btc'] if 'symbol' in df.columns else pd.DataFrame()
-        if not btc_df.empty:
+        if not btc_df.empty and 'current_price' in btc_df.columns:
             st.metric(label="Bitcoin (BTC)", value=f"${btc_df['current_price'].values[0]:,}", 
                       delta=f"{btc_df[p_change_col].values[0]}%" if p_change_col else None)
         else:
@@ -116,7 +120,7 @@ if df is not None and not df.empty:
 
     with col3:
         eth_df = df[df['symbol'].str.lower() == 'eth'] if 'symbol' in df.columns else pd.DataFrame()
-        if not eth_df.empty:
+        if not eth_df.empty and 'current_price' in eth_df.columns:
             st.metric(label="Ethereum (ETH)", value=f"${eth_df['current_price'].values[0]:,}", 
                       delta=f"{eth_df[p_change_col].values[0]}%" if p_change_col else None)
         else:
@@ -124,7 +128,7 @@ if df is not None and not df.empty:
 
     with col4:
         sol_df = df[df['symbol'].str.lower() == 'sol'] if 'symbol' in df.columns else pd.DataFrame()
-        if not sol_df.empty:
+        if not sol_df.empty and 'current_price' in sol_df.columns:
             st.metric(label="Solana (SOL)", value=f"${sol_df['current_price'].values[0]:,}", 
                       delta=f"{sol_df[p_change_col].values[0]}%" if p_change_col else None)
         else:
