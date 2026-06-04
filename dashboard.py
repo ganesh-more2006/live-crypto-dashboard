@@ -15,7 +15,7 @@ st.title("🚀 Live Crypto Trends Dashboard")
 st.write("Fetching real-time updates directly from the Supabase cloud database.")
 
 # Embedded your verified Supabase PostgreSQL connection URI string
-DB_URI = "postgresql://postgres:5wMyFJQNMvgpON2N@db.eczpryzdvumwqtktwkgm.supabase.co:5432/postgres"
+DB_URI = "postgresql://postgres:5wMyFJQNMvgpON2N@aws-0-ap-south-1.pooler.supabase.co:6543/postgres?sslmode=require"
 
 @st.cache_resource
 def get_db_engine():
