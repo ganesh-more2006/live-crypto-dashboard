@@ -23,8 +23,17 @@ except Exception:
 
 @st.cache_resource
 def get_db_engine():
-    """Initializes and caches the SQLAlchemy database engine connection."""
-    return create_engine(DB_URI, pool_pre_ping=True)
+    """Initializes and caches the SQLAlchemy database engine connection with explicit tenant verification flags."""
+    # Force client encoding and explicitly pass the project ID as an option argument
+    return create_engine(
+        DB_URI, 
+        connect_args={
+            "options": "-c project=eczpryzdvumwqtktwkgm",
+            "keepalives": 1,
+            "keepalives_idle": 30
+        },
+        pool_pre_ping=True
+    )
 
 def fetch_data():
     """Executes SQL query to pull the latest live data from crypto_live_trends table."""
