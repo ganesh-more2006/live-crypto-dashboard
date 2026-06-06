@@ -14,25 +14,23 @@ st_autorefresh(interval=10 * 1000, key="cryptorefresh")
 st.title("🚀 Live Crypto Trends Dashboard")
 st.write("Fetching real-time updates directly from the Supabase cloud database.")
 
-# Standard fallback mechanism: Local connection uses string, production cloud uses secure st.secrets
+# Robust fallback mechanism: Reads from safe production secrets first, falls back to direct URI for local
 try:
-    DB_URI = st.secrets["DB_URI"]
+    if "connections" in st.secrets and "postgresql" in st.secrets["connections"]:
+        DB_URI = st.secrets["connections"]["postgresql"]["url"]
+    else:
+        DB_URI = st.secrets["DB_URI"]
 except Exception:
-    # Stable direct link for your local machine testing
+    # Direct URI string exclusively for your local VS Code testing
     DB_URI = "postgresql://postgres:5wMyFJQNMvgpON2N@db.eczpryzdvumwqtktwkgm.supabase.co:5432/postgres"
 
 @st.cache_resource
 def get_db_engine():
-    """Initializes and caches the SQLAlchemy database engine connection with explicit tenant verification flags."""
-    # Force client encoding and explicitly pass the project ID as an option argument
+    """Initializes and caches the SQLAlchemy database engine connection securely."""
     return create_engine(
-        DB_URI, 
-        connect_args={
-            "options": "-c project=eczpryzdvumwqtktwkgm",
-            "keepalives": 1,
-            "keepalives_idle": 30
-        },
-        pool_pre_ping=True
+        DB_URI,
+        pool_pre_ping=True,
+        pool_recycle=300
     )
 
 def fetch_data():
