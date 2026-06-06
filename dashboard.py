@@ -14,21 +14,17 @@ st_autorefresh(interval=10 * 1000, key="cryptorefresh")
 st.title("🚀 Live Crypto Trends Dashboard")
 st.write("Fetching real-time updates directly from the Supabase cloud database.")
 
-# Clean pooler connection URI without any messy string query parameters
-DB_URI = "postgresql+pg8000://postgres:5wMyFJQNMvgpON2N@aws-0-ap-south-1.pooler.supabase.com:6543/postgres"
+# Standard fallback mechanism: Local connection uses string, production cloud uses secure st.secrets
+try:
+    DB_URI = st.secrets["DB_URI"]
+except Exception:
+    # Stable direct link for your local machine testing
+    DB_URI = "postgresql://postgres:5wMyFJQNMvgpON2N@db.eczpryzdvumwqtktwkgm.supabase.co:5432/postgres"
 
 @st.cache_resource
 def get_db_engine():
-    """Initializes and caches the SQLAlchemy database engine connection with explicit tenant options."""
-    # Passing the project identifier safely inside connect_args as expected by pg8000
-    return create_engine(
-        DB_URI, 
-        connect_args={
-            "sslmode": "verify-full",
-            "options": "project=eczpryzdvumwqtktwkgm"
-        },
-        pool_pre_ping=True
-    )
+    """Initializes and caches the SQLAlchemy database engine connection."""
+    return create_engine(DB_URI, pool_pre_ping=True)
 
 def fetch_data():
     """Executes SQL query to pull the latest live data from crypto_live_trends table."""

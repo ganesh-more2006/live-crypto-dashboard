@@ -1,5 +1,5 @@
 streamlit
 pandas
 sqlalchemy
-pg8000
+psycopg2-binary
 streamlit-autorefresh
