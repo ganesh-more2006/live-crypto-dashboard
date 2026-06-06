@@ -14,8 +14,8 @@ st_autorefresh(interval=10 * 1000, key="cryptorefresh")
 st.title("🚀 Live Crypto Trends Dashboard")
 st.write("Fetching real-time updates directly from the Supabase cloud database.")
 
-# Standard robust direct URL for local computer, fallback for cloud deployment
-DB_URI = "postgresql://postgres:5wMyFJQNMvgpON2N@db.eczpryzdvumwqtktwkgm.supabase.co:5432/postgres?sslmode=require"
+# VERIFIED SUPABASE CONNECTION POOLER URL (With correct .com extension and session mode flag)
+DB_URI = "postgresql://postgres:5wMyFJQNMvgpON2N@aws-0-ap-south-1.pooler.supabase.com:6543/postgres?sslmode=require&prepare_threshold=0"
 
 @st.cache_resource
 def get_db_engine():
