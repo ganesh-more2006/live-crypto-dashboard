@@ -15,7 +15,8 @@ st.title("🚀 Live Crypto Trends Dashboard")
 st.write("Fetching real-time updates directly from the Supabase cloud database.")
 
 # Clean, production-safe URI using pure-Python pg8000 driver to bypass Streamlit Cloud IPv6 network locks
-DB_URI = "postgresql+pg8000://postgres:5wMyFJQNMvgpON2N@db.eczpryzdvumwqtktwkgm.supabase.co:5432/postgres"
+# Combined pure-Python pg8000 driver with Supabase connection pooler domain and port
+DB_URI = "postgresql+pg8000://postgres:5wMyFJQNMvgpON2N@aws-0-ap-south-1.pooler.supabase.com:6543/postgres"
 
 @st.cache_resource
 def get_db_engine():
